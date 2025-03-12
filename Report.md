@@ -19,5 +19,4 @@ Key Features:
 ✅ Dynamic UI & Dark Theme: Enhanced user experience with a clean, modern interface.
 ✅ Smart Conversion Engine: Powered by AI-assisted conversion formulas for accurate results.
 ✅ Real-time Unit Switching: Select from multiple units and get instant conversions.
-✅ Helpful Examples: Sidebar guide to simplify unit conversions.
-
+✅ Helpful Examples: Sidebar guide to simplify unit conversions. 
