@@ -145,16 +145,23 @@ if option == "Update Book":
         if book_to_update:
             book_data = df[df['Title'] == book_to_update].iloc[0]
             
+            # List of genres
+            genres = ['Fiction', 'Non-Fiction', 'Biography', 'Science Fiction', 
+                     'Mystery', 'Romance', 'Horror', 'Thriller', 'Fantasy', 
+                     'Drama', 'Comedy', 'Action', 'Adventure', 'Animation',
+                     'Children']
+            
             new_title = st.text_input("Title", value=book_data['Title'])
             new_author = st.text_input("Author", value=book_data['Author'])
             new_year = st.text_input("Year", value=book_data['Year'])
-            new_genre = st.selectbox("Genre", 
-                                   ['Fiction', 'Non-Fiction', 'Biography', 'Science Fiction', 
-                                    'Mystery', 'Romance', 'Horror', 'Thriller', 'Fantasy', 
-                                    'Drama', 'Comedy', 'Action', 'Adventure', 'Animation',
-                                    'Children', 'Young Adult'],
-                                   index=book_data['Genre'])
-            new_read = st.checkbox("Read", value=book_data['Read'])
+            
+            try:
+                current_genre_index = genres.index(book_data['Genre'])
+            except ValueError:
+                current_genre_index = 0  # Default to first genre if current genre not found
+                
+            new_genre = st.selectbox("Genre", genres, index=current_genre_index)
+            new_read = st.checkbox("Read", value=bool(book_data['Read']))
             
             if st.button("Update Book"):
                 df.loc[df['Title'] == book_to_update, 'Title'] = new_title
