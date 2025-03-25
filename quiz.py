@@ -56,52 +56,48 @@ questions = [
     }
 ]
 
-# Home page
-st.title("Python Quiz")
-st.write("Welcome to the Python Quiz!")
-st.write("You will be asked 10 questions about Python.")
-st.write("Each question has 4 options (A, B, C, D).")
-st.write("Select the correct answer and click on the button to submit your answer.")
-st.write("Good luck!")
-st.write("Let's start the quiz!")
-
 # Initialize session state
 if 'current_question' not in st.session_state:
-    st.session_state.current_question = random.choice(questions)
+    st.session_state.current_question = None
     st.session_state.score = 0
     st.session_state.answered = False
     st.session_state.quiz_started = False
-    st.session_state.next_question_time = None  # Timestamp for next question
+    st.session_state.selected_choice = None
+    st.session_state.question_index = 0
 
-# Function to run the quiz
-def run_quiz(questions):
+# Home page
+st.title("Python Quiz")
+st.write("Welcome to the Python Quiz! You will answer 10 questions about Python.")
+
+# Start Quiz Button
+if not st.session_state.quiz_started:
     if st.button("Start Quiz"):
         st.session_state.quiz_started = True
-    
-        if 'quiz_started' in st.session_state and st.session_state.quiz_started:
-            question = st.session_state.current_question
-            st.subheader(question["question"])
-        selected_choice = st.radio("Select your answer:", question["choices"])
+        st.session_state.question_index = 0
+        st.session_state.current_question = random.choice(questions)
+
+# Quiz Logic
+if st.session_state.quiz_started:
+    question = st.session_state.current_question
+
+    if question:
+        st.subheader(question["question"])
+        st.session_state.selected_choice = st.radio("Select your answer:", question["choices"], key=st.session_state.question_index)
 
         if st.button("Submit Answer") and not st.session_state.answered:
-            if selected_choice[0] == question["answer"]:  # Compare the first character (A/B/C/D)
+            user_answer = st.session_state.selected_choice.split(".")[0]  # Extract 'A', 'B', etc.
+            if user_answer == question["answer"]:
                 st.success("Correct!")
                 st.session_state.score += 1
             else:
-                st.error("Incorrect!")
-                st.error(f"The correct answer is {question['answer']}")
-                
-            st.session_state.answered = True
-            st.session_state.next_question_time = time.time() + 3  # Set timestamp for next question
+                st.error(f"Incorrect! The correct answer is {question['answer']}")
 
-        # Check if it's time to move to the next question
-        if st.session_state.answered and time.time() >= st.session_state.next_question_time:
+            st.session_state.answered = True
+            time.sleep(2)  # Wait before next question
+
+            # Load next question
             st.session_state.current_question = random.choice(questions)
             st.session_state.answered = False
-            st.session_state.next_question_time = None
-            st.rerun()
+            st.session_state.question_index += 1
 
-        st.write(f"Your current score is: {st.session_state.score}")
-
-# Run the quiz
-run_quiz(questions)
+        st.write(f"Your current score: {st.session_state.score}")
