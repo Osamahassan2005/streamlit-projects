@@ -1,13 +1,12 @@
 import streamlit as st
 import random
-import time
 
-# List of questions, choices, and answers
+# List of questions
 questions = [
     {
         "question": "What is the output of 2 + 2 * 3?",
         "choices": ["A. 8", "B. 10", "C. 12", "D. 6"],
-        "answer": "A"
+        "answer": "B"
     },
     {
         "question": "Which of the following is used to define a function in Python?",
@@ -57,48 +56,54 @@ questions = [
 ]
 
 # Initialize session state
-if 'current_question' not in st.session_state:
-    st.session_state.current_question = None
-    st.session_state.score = 0
-    st.session_state.answered = False
+if "quiz_started" not in st.session_state:
     st.session_state.quiz_started = False
-    st.session_state.selected_choice = None
+    st.session_state.score = 0
     st.session_state.question_index = 0
+    st.session_state.selected_choice = None
+    st.session_state.questions_shuffled = random.sample(questions, len(questions))  # Shuffle all questions
 
-# Home page
+# Home Page
 st.title("Python Quiz")
-st.write("Welcome to the Python Quiz! You will answer 10 questions about Python.")
+st.write("Test your Python knowledge with this quiz!")
 
 # Start Quiz Button
 if not st.session_state.quiz_started:
     if st.button("Start Quiz"):
         st.session_state.quiz_started = True
+        st.session_state.score = 0
         st.session_state.question_index = 0
-        st.session_state.current_question = random.choice(questions)
+        st.session_state.questions_shuffled = random.sample(questions, len(questions))  # Shuffle again on restart
+        st.rerun()
 
 # Quiz Logic
 if st.session_state.quiz_started:
-    question = st.session_state.current_question
+    if st.session_state.question_index < len(st.session_state.questions_shuffled):
+        question = st.session_state.questions_shuffled[st.session_state.question_index]
 
-    if question:
         st.subheader(question["question"])
-        st.session_state.selected_choice = st.radio("Select your answer:", question["choices"], key=st.session_state.question_index)
+        selected_choice = st.radio("Select your answer:", question["choices"], key=st.session_state.question_index)
 
-        if st.button("Submit Answer") and not st.session_state.answered:
-            user_answer = st.session_state.selected_choice.split(".")[0]  # Extract 'A', 'B', etc.
+        if st.button("Submit Answer"):
+            user_answer = selected_choice.split(".")[0]  # Extract 'A', 'B', etc.
+
             if user_answer == question["answer"]:
                 st.success("Correct!")
                 st.session_state.score += 1
             else:
                 st.error(f"Incorrect! The correct answer is {question['answer']}")
 
-            st.session_state.answered = True
-            time.sleep(2)# Wait before next question 
-            st.rerun() 
-
-            # Load next question
-            st.session_state.current_question = random.choice(questions)
-            st.session_state.answered = False
+            # Move to the next question
             st.session_state.question_index += 1
+            st.rerun()  # Instantly update the question
 
         st.write(f"Your current score: {st.session_state.score}")
+
+    else:
+        st.success(f"Quiz Completed! Your final score is {st.session_state.score} / {len(questions)}")
+        if st.button("Restart Quiz"):
+            st.session_state.quiz_started = False
+            st.session_state.score = 0
+            st.session_state.question_index = 0
+            st.session_state.questions_shuffled = random.sample(questions, len(questions))  # Shuffle again
+            st.rerun()
