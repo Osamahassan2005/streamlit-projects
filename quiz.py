@@ -93,7 +93,8 @@ if st.session_state.quiz_started:
                 st.error(f"Incorrect! The correct answer is {question['answer']}")
 
             st.session_state.answered = True
-            time.sleep(2)  # Wait before next question
+            time.sleep(2)# Wait before next question 
+            st.rerun() 
 
             # Load next question
             st.session_state.current_question = random.choice(questions)
